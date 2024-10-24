@@ -65,3 +65,8 @@ Compare only selected arches:
 ```
 
 Check the `example-res.json` to see an example with real data.
+
+> Notice! 
+> 
+> If only one architecture is specified using the `--arch` option and it is not exists, the program will terminate immediately.
+> Otherwise, the `--arch` option works in filter mode and will warn about missing architectures.

@@ -28,13 +28,20 @@ def get_branch_packages(branch: str, arch_list: Optional[List[str]] = None):
     return convert_packages_to_dict_and_filter(response["packages"], arch_list)
 
 
-def log_missing_architectures(
+def log_missing_architectures_one_branch(
     missing_arches: Set[str], missing_in: str, exists_in: str
 ) -> None:
     for arch in missing_arches:
         eprint(
             f"Warning: Architecture '{arch}' is missing in '{missing_in}' "
             f"but exists in '{exists_in}', so it will be skipped."
+        )
+
+
+def log_missing_architectures_both(missing_arches: Set[str]) -> None:
+    for arch in missing_arches:
+        eprint(
+            f"Warning: Architecture '{arch}' is missing at 2 branches, so it will be skipped."
         )
 
 
@@ -52,13 +59,18 @@ def compare_branches(
 
     arches_first = set(first_packages.keys())
     arches_second = set(second_packages.keys())
-
+    
+    same_arches = arches_first & arches_second
+    missing_both = set(arch_list) - (arches_first | arches_second)
+    
     missing_in_first = arches_second - arches_first
     missing_in_second = arches_first - arches_second
-    same_arches = arches_first & arches_second
 
-    log_missing_architectures(missing_in_first, first_branch, second_branch)
-    log_missing_architectures(missing_in_second, second_branch, first_branch)
+    log_missing_architectures_both(missing_both)
+    log_missing_architectures_one_branch(missing_in_first, first_branch, second_branch)
+    log_missing_architectures_one_branch(missing_in_second, second_branch, first_branch)
+
+    same_arches = arches_first & arches_second
 
     comparison_result = {}
 

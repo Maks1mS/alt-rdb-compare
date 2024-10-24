@@ -23,4 +23,4 @@ try:
         )
     )
 except Exception as e:
-    eprint(e)
+    eprint(f"Exception: {e}")
