@@ -69,8 +69,8 @@ def compare_branches(
         first_pkg_names = set(first_arch_packages.keys())
         second_pkg_names = set(second_arch_packages.keys())
         
-        missing_in_first_pkgs = first_pkg_names - second_pkg_names
-        missing_in_second_pkgs = second_pkg_names - first_pkg_names
+        missing_in_second_pkgs = first_pkg_names - second_pkg_names
+        missing_in_first_pkgs = second_pkg_names - first_pkg_names
         same_packages = first_pkg_names & second_pkg_names
         
         newer_fist = []
@@ -99,7 +99,7 @@ def compare_branches(
                 })
 
         comparison_result[arch] = {
-            'exists': {
+            'missing': {
                 'first': list(missing_in_first_pkgs),
                 'second': list(missing_in_second_pkgs),
             },
