@@ -15,7 +15,7 @@ def get_branch_packages(
     """
     
     arch = None
-    if arch_list:
+    if arch_list and len(arch_list) == 1:
         arch = arch_list[0]
 
     response = api.export_branch_binary_packages(
