@@ -1,3 +1,4 @@
+import requests
 import requests_cache
 from requests_cache import timedelta
 from alt_rdb_comp.utils import eprint
@@ -37,12 +38,14 @@ class ALTLinuxRDBApi:
                 params=params,
             )
             return req.json()
-        except requests_cache.exceptions.RequestException as e:
-            eprint(f"HTTP Request failed: {e}")
-            return {}
+        except requests.exceptions.RequestException as e:
+            raise Exception(
+                f"HTTP Request failed: {e}"
+            )
         except ValueError:
-            eprint("Failed to decode JSON response")
-            return {}
+            raise Exception(
+                f"Failed to decode JSON response from {endpoint}"
+            )
 
 
     def export_branch_binary_packages(self, branch = "sisyphus", arch = None) -> dict:
