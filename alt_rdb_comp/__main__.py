@@ -2,6 +2,7 @@ import argparse
 import json
 
 from alt_rdb_comp.lib import compare_branches
+from alt_rdb_comp.utils import eprint
 
 parser = argparse.ArgumentParser(
     prog="alt-rdb-comp",
@@ -26,12 +27,14 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-print(json.dumps(
-    compare_branches(
-        args.first_branch, 
-        args.second_branch, 
-        args.arch
-    ),
-    indent=4
-))
-
+try:
+    print(json.dumps(
+        compare_branches(
+            args.first_branch, 
+            args.second_branch, 
+            args.arch
+        ),
+        indent=4
+    ))
+except Exception as e:
+    eprint(e)
