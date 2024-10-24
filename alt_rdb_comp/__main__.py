@@ -1,5 +1,7 @@
 import argparse
-from alt_rdb_comp.api import ALTLinuxRDBApi
+import json
+
+from alt_rdb_comp.lib import compare_branches
 
 parser = argparse.ArgumentParser(
     prog="alt-rdb-comp",
@@ -12,5 +14,13 @@ parser.add_argument("arch")
 
 args = parser.parse_args()
 
-api = ALTLinuxRDBApi()
+
+print(json.dumps(
+    compare_branches(
+        args.first_branch, 
+        args.second_branch, 
+        args.arch
+    ),
+    indent=4
+))
 
