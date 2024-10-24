@@ -13,3 +13,7 @@ Usage:
 ```
 ./rdb-compare sisyphus p10 aarch64 > res.json
 ```
+
+```
+./rdb-compare sisyphus p10 > res.json
+```
