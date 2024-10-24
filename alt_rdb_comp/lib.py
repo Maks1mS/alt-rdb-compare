@@ -76,7 +76,7 @@ def compare_branches(
         newer_fist = []
         
         for package_name in same_packages:
-            first_pkg, second_pkg = first_arch_packages[package_name], first_arch_packages[package_name]
+            first_pkg, second_pkg = first_arch_packages[package_name], second_arch_packages[package_name]
             
             version_first = build_version_string(
                 first_pkg
