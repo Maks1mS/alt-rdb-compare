@@ -63,3 +63,5 @@ Compare only selected arches:
     ...
 }
 ```
+
+Check the `example-res.json` to see an example with real data.
