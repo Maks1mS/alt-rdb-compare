@@ -1,2 +1,6 @@
 requests-cache==1.2.1
 cmp_version==3.0.0
+
+# Dev dependencies.
+# May be moved to another requirements.txt if needed
+black==24.10.0
