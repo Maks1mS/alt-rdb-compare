@@ -1,6 +1,8 @@
+from typing import List
 import requests
 import requests_cache
 from requests_cache import timedelta
+import re
 
 
 class HTTPError(Exception):
@@ -23,11 +25,16 @@ class ServerError(HTTPError):
     pass
 
 
-class ALTLinuxRDBApi(Exception):
+class ALTLinuxRDBApiError(Exception):
     pass
 
+class UnknownBranchErorr(ALTLinuxRDBApiError):
+    def __init__(self, branch: str, available_branches: List[str]):
+        self.branch = branch
+        self.available_branches = available_branches
+        super().__init__(f"Branch '{branch}' is unknown. Allowed branches: {', '.join(available_branches)}")
 
-class ArchitectureMissingError(ALTLinuxRDBApi):
+class ArchitectureMissingError(ALTLinuxRDBApiError):
     def __init__(self, arch: str, branch: str):
         self.arch = arch
         self.branch = branch
@@ -82,6 +89,34 @@ class ALTLinuxRDBApi:
         except ValueError:
             raise Exception(f"Failed to decode JSON response from {endpoint}")
 
+    def _handle_unknown_package_set(self, e: ClientError, branch: str):
+        validation_message = e.json.get("validation_message", [])
+            
+        if len(validation_message) != 2:
+            return
+        
+        message: str = validation_message[0]
+        if not message.startswith("unknown package set name :"):
+            return
+        message = validation_message[1]
+        
+        package_sets = re.findall(r"'([\w]+)'", message)
+        
+        raise UnknownBranchErorr(
+            branch=branch,
+            available_branches=package_sets
+        )
+
+    def _handle_invalid_architecture(self, e: ClientError, branch: str, arch: str):
+        errors = e.json.get("errors", {})        
+        arch_error: str = errors.get("arch", "")
+        expected_prefix = "package architecture Invalid architecture name"
+
+        if not arch_error.startswith(expected_prefix):
+            return 
+
+        raise ArchitectureMissingError(arch, branch) from e
+
     def export_branch_binary_packages(self, branch="sisyphus", arch=None) -> dict:
         """
         Retrieves binary packages for a specific branch and architecture.
@@ -97,14 +132,7 @@ class ALTLinuxRDBApi:
         try:
             return self._call("GET", f"/export/branch_binary_packages/{branch}", params)
         except ClientError as e:
-            errors = e.json.get("errors", {})
-            arch_error = errors.get("arch", "")
-            expected_prefix = "package architecture Invalid architecture name"
-
-            if arch_error.startswith(expected_prefix):
-                arch = params.get(
-                    "arch", "unknown"
-                )  # Assuming 'arch' is part of params
-                raise ArchitectureMissingError(arch, branch) from e
-
+            self._handle_unknown_package_set(e, branch)
+            self._handle_invalid_architecture(e, branch, arch)
+            # Raise common error if not handled
             raise e
