@@ -59,10 +59,10 @@ def compare_branches(
 
     arches_first = set(first_packages.keys())
     arches_second = set(second_packages.keys())
-    
+
     same_arches = arches_first & arches_second
     missing_both = set(arch_list) - (arches_first | arches_second)
-    
+
     missing_in_first = arches_second - arches_first
     missing_in_second = arches_first - arches_second
 

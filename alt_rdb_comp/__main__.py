@@ -7,9 +7,7 @@ from alt_rdb_comp.utils import eprint
 
 prog_name = os.getenv("PROG_NAME", os.path.basename(__file__))
 
-parser = argparse.ArgumentParser(
-    prog=prog_name, description="ALTLinux RDB Compare"
-)
+parser = argparse.ArgumentParser(prog=prog_name, description="ALTLinux RDB Compare")
 
 parser.add_argument("first_branch", help="First branch to compare")
 

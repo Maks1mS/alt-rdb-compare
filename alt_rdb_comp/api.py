@@ -28,11 +28,15 @@ class ServerError(HTTPError):
 class ALTLinuxRDBApiError(Exception):
     pass
 
+
 class UnknownBranchErorr(ALTLinuxRDBApiError):
     def __init__(self, branch: str, available_branches: List[str]):
         self.branch = branch
         self.available_branches = available_branches
-        super().__init__(f"Branch '{branch}' is unknown. Allowed branches: {', '.join(available_branches)}")
+        super().__init__(
+            f"Branch '{branch}' is unknown. Allowed branches: {', '.join(available_branches)}"
+        )
+
 
 class ArchitectureMissingError(ALTLinuxRDBApiError):
     def __init__(self, arch: str, branch: str):
@@ -91,29 +95,26 @@ class ALTLinuxRDBApi:
 
     def _handle_unknown_package_set(self, e: ClientError, branch: str):
         validation_message = e.json.get("validation_message", [])
-            
+
         if len(validation_message) != 2:
             return
-        
+
         message: str = validation_message[0]
         if not message.startswith("unknown package set name :"):
             return
         message = validation_message[1]
-        
+
         package_sets = re.findall(r"'([\w]+)'", message)
-        
-        raise UnknownBranchErorr(
-            branch=branch,
-            available_branches=package_sets
-        )
+
+        raise UnknownBranchErorr(branch=branch, available_branches=package_sets)
 
     def _handle_invalid_architecture(self, e: ClientError, branch: str, arch: str):
-        errors = e.json.get("errors", {})        
+        errors = e.json.get("errors", {})
         arch_error: str = errors.get("arch", "")
         expected_prefix = "package architecture Invalid architecture name"
 
         if not arch_error.startswith(expected_prefix):
-            return 
+            return
 
         raise ArchitectureMissingError(arch, branch) from e
 
